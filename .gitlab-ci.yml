@@ -1,0 +1,31 @@
+image: docker:19.03.0
+
+variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+
+services:
+    - docker:19.03.0-dind
+
+before_script:
+    - docker info
+
+variables:
+    AUTHOR: roosri
+    PROJECTNAME: hellohttp
+
+stages:
+    - build
+    - release
+
+build:
+    stage: build
+    script:
+        - docker build . -t roosri/hellohttp:$(git describe --tags) --build-arg BUILD=$(git rev-parse --short HEAD) --build-arg VERSION=$(git describe)
+
+# release:
+#     stage: release
+#     script:
+#         - semantic-release --no-ci
+#     only:
+#         - master
